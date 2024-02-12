@@ -8,7 +8,7 @@ const authMiddleware = asyncHandler(async(req,res,next)=>{
     try {
         
         const token = req.cookies?.accessToken || req.Header("Authorization")?.replace("Bearer")
-    
+        console.log(token)
         if(!token){
             throw new ApiError(400,"You are not authorized")
         }
