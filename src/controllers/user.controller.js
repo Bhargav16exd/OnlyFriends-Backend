@@ -51,6 +51,7 @@ const initiateLogin = asyncHandler(async(req,res)=>{
 
     const ifUserExist = await User.findOne({email}).select("+tempOTP")
       
+    console.log(ifUserExist)
 
     if(ifUserExist && ifUserExist.tempOTP === null){
         throw new ApiError(400,"Already Registered User with same email")
@@ -138,15 +139,11 @@ const login = asyncHandler(async(req,res)=>{
 
     const { email , password } = req.body;
 
-   
-
     if(!email || !password){
         throw new ApiError(400,"All Fields are required")
     }
      
-    const user = await User.findOne({email , tempOTP:null}).select("+password");
-
-   
+    const user = await User.findOne({email}).select("+password");
 
     if(!user){
         throw new ApiError(400,"No User exist with following email")
@@ -167,8 +164,7 @@ const login = asyncHandler(async(req,res)=>{
     const options = {
         httpOnly:true,
         secure:true,
-        SameSite:'none',
-        maxAge: 1000*60*60*24*7
+        SameSite:"lax",
     }
 
 
@@ -186,11 +182,12 @@ const login = asyncHandler(async(req,res)=>{
 
 const logout = asyncHandler(async(req,res)=>{
    
-    
+    console.log("logout")
     
     const options = {
         httpOnly:true,
-        secure:true
+        secure:true,
+        SameSite:"lax",
     }
 
     return res
@@ -243,6 +240,7 @@ const resetPassword = asyncHandler(async(req,res)=>{
 
     const user = await User.findOne({forgotPasswordToken:encryptedResetToken , forgotPasswordExpiry:{$gt:Date.now()}})
 
+    console.log(user)
 
     if(!user){
         throw new ApiError(400,"Session Expired Try Again Later")
@@ -255,7 +253,7 @@ const resetPassword = asyncHandler(async(req,res)=>{
 
     await user.save();
      
-
+    console.log(user)
     return res
     .status(200)
     .json(
@@ -268,7 +266,7 @@ const updateProfile = asyncHandler(async(req,res)=>{
 
     const {year,branch,name} = req.body;
 
-   
+    console.log("flag")
 
     const user = await User.findByIdAndUpdate(req.user._id,{
         year,
@@ -276,12 +274,13 @@ const updateProfile = asyncHandler(async(req,res)=>{
         name
     },{new:true})
 
+    console.log("flag")
 
     if(!user){
         throw new ApiError(500,"Error While Updating Profile")
     }
 
-
+    console.log("flag")
 
     return res
     .status(200)
@@ -318,15 +317,12 @@ const getAllUsers = asyncHandler(async (req, res) => {
     if(!page){
         page = 1;
     }
-    
-
-
+  
     const users = await User.find({tempOTP:null , _id: { $ne: req.user._id } })
       .skip(skip)
       .limit(limit)
       .exec();
-     
-
+   
 
     if(users.length === 0){
         return res.status(200).json(new ApiResponse(200,"No Users Found"))
@@ -335,7 +331,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
-        new ApiResponse(200,"User Fetch Success", users)
+        new ApiResponse(200,"User Fetch Success", users )
     );
   });
 
