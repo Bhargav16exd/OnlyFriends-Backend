@@ -17,9 +17,7 @@ const sendLetter = asyncHandler(async(req,res)=>{
 
     const existingLetter = await Letter.findOne({to,from})
 
-    if(existingLetter){
-        throw new ApiError(400,"Your Limit has already reached")
-    }
+   
 
     if(!content){
         throw new ApiError(400,"Letter Data is required")
