@@ -88,9 +88,9 @@ const initiateLogin = asyncHandler(async(req,res)=>{
 
 const createUser = asyncHandler(async(req,res)=>{
 
-    const {otp , name , password , email , year , branch , gender} = req.body
+    const {otp , name , password , email , year , branch , gender } = req.body
     console.log(req.body)
-    if(!otp || !name || !password || !email || !gender ){
+    if(!otp || !name || !password || !email || !gender || !year || !branch ){
         throw new ApiError(400 , "All feilds are required")
     }
 
